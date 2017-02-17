@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fast prototyping</title>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+    <style>
+        html, body, .base-container {
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font: 14px OpenSans, Arial, Helvetica, sans-serif;
+            font-family: OpenSans, sans-serif;
+        }
+
+        .base-container {
+            width: 1400px;
+            height: 1000px;
+            background-color: #F2F2F2;
+            border: 1px solid #9b9b9b;
+            box-sizing: border-box;
+            transform-origin: top left;
+        }
+
+        .base-widget {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .context-menu-button {
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            width: 40px;
+            height: 40px;
+        }
+
+        .context-menu-button--locked {
+            bottom: calc(50% - 20px);
+        }
+
+        .context-menu-button::after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #6699ff;
+            margin: 15px 0 0 15px;
+        }
+
+        .context-menu {
+            bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            padding-right: 19px;
+            box-sizing: border-box;
+        }
+
+        .color-menu {
+            bottom: 77px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .color-button {
+            width: 28px;
+            height: 28px;
+            background-color: #9b9b9b;
+            border: solid 1px rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            margin-right: 11px;
+            margin-bottom: 11px;
+        }
+
+        .color-button--yellow {
+            background-color: #fbe359;
+        }
+
+        .color-button--orange {
+            background-color: #ff6e48;
+        }
+
+        .color-button--blue {
+            background-color: #3478ff;
+        }
+
+        .color-button--white {
+            background-color: #ffffff;
+        }
+
+        .color-button--black {
+            background-color: #000000;
+        }
+
+        .menu {
+            width: 150px;
+            border-radius: 4px;
+            background-color: #000000;
+            position: absolute;
+            padding-top: 11px;
+            padding-left: 19px;
+            left: calc(50% - 75px);
+            box-sizing: border-box;
+            display: none;
+        }
+
+        .trash-button {
+            padding: 2px 6px;
+        }
+
+        .legend-button {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 40px;
+            height: 40px;
+        }
+
+        .legend {
+            padding: 63px 76px 50px 81px;
+            border-radius: 4px;
+            background-color: #ffffff;
+            box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2);
+            position: absolute;
+            left: calc(50% - 300px);
+            top: calc(50% - 300px);
+            transition: opacity cubic-bezier(0.22, 0.61, 0.36, 1) .3s;
+        }
+
+        .legend .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .button {
+            cursor: pointer;
+        }
+
+        .legend-overlay {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+
+    </style>
+    <script type="text/javascript" src="libs/ndollar.js"></script>
+    <link rel="stylesheet" href="src/wireframes.css">
+</head>
+<body>
+<div id="baseContainer" class="base-container">
+    <canvas id="strokeCanvas" width="1400px" height="1000px"></canvas>
+</div>
+
+<div id="contextMenu" class="context-menu menu">
+    <div id="contextMenu__color" class="color-button button"></div>
+    <div id="contextMenu__delete" class="button trash-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="25" viewBox="0 0 21 25"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <defs>
+                <path id="a" d="M2 5h17v18c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V5z"/>
+                <mask id="c" width="17" height="20" x="0" y="0" fill="#fff">
+                    <use xlink:href="#a"/>
+                </mask>
+                <path id="b" d="M0 2C0 .9.9 0 2 0h17c1.1 0 2 .9 2 2v4H0V2z"/>
+                <mask id="d" width="21" height="6" x="0" y="0" fill="#fff">
+                    <use xlink:href="#b"/>
+                </mask>
+            </defs>
+            <g fill="none" fill-rule="evenodd">
+                <use stroke="#FFF" stroke-width="2" mask="url(#c)" xlink:href="#a"/>
+                <use stroke="#FFF" stroke-width="2" mask="url(#d)" xlink:href="#b"/>
+                <path fill="#FFF" d="M6 6h1v15H6zm4 0h1v15h-1zm4 0h1v15h-1z"/>
+            </g>
+        </svg>
+    </div>
+</div>
+<div id="colorMenu" class="color-menu menu">
+    <div class="color-button color-button--yellow button"></div>
+    <div class="color-button color-button--orange button"></div>
+    <div class="color-button color-button--blue button"></div>
+    <div class="color-button color-button--white button"></div>
+    <div class="color-button color-button--gray button"></div>
+    <div class="color-button color-button--black button"></div>
+</div>
+<div id="displayLegend" class="legend-button button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+        <path d="M18 30h4V18h-4v12zm2-30C8.96 0 0 8.96 0 20s8.96 20 20 20 20-8.96 20-20S31.04 0 20 0zm0 36c-8.82 0-16-7.18-16-16S11.18 4 20 4s16 7.18 16 16-7.18 16-16 16zm-2-22h4v-4h-4v4z"
+              opacity=".2"/>
+    </svg>
+</div>
+<div id="legend" class="legend-overlay">
+    <div class="legend">
+        <div id="hideLegend" class="close-button button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14">
+                <path fill="#030303" fill-rule="evenodd"
+                      d="M7.64 6.58l5.3-5.3c.3-.3.3-.77 0-1.06-.3-.3-.76-.3-1.05 0l-5.33 5.3-5.3-5.3C.97-.08.5-.08.22.22c-.3.3-.3.77 0 1.06l5.3 5.3-5.3 5.3c-.3.3-.3.78 0 1.07.3.3.77.3 1.06 0l5.3-5.3 5.3 5.3c.3.3.78.3 1.07 0 .3-.3.3-.77 0-1.06l-5.3-5.33z"
+                      opacity=".2"/>
+            </svg>
+        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="443" height="484" viewBox="0 0 445 482">
+            <g fill="none" fill-rule="evenodd">
+                <text fill="#4A4A4A" font-family="OpenSans, Open Sans" font-size="13" transform="translate(1 1)">
+                    <tspan x="9" y="96">rectangle</tspan>
+                </text>
+                <text fill="#4A4A4A" font-family="OpenSans, Open Sans" font-size="13" transform="translate(1 1)">
+                    <tspan x="206.69" y="96">oval</tspan>
+                </text>
+                <text fill="#4A4A4A" font-family="OpenSans, Open Sans" font-size="13" transform="translate(1 1)">
+                    <tspan x="383.99" y="96">image</tspan>
+                </text>
+                <text fill="#4A4A4A" font-family="OpenSans, Open Sans" font-size="13" transform="translate(1 1)">
+                    <tspan x="27.49" y="224">text</tspan>
+                </text>
+                <text fill="#4A4A4A" font-family="OpenSans, Open Sans" font-size="13" transform="translate(1 1)">
+                    <tspan x="14.37" y="352">textfield</tspan>
+                </text>
+                <text fill="#4A4A4A" font-family="OpenSans, Open Sans" font-size="13" transform="translate(1 1)">
+                    <tspan x="28.08" y="480">line</tspan>
+                </text>
+                <path stroke="#3478FF" stroke-width="2" d="M1 188l78 .9M1 319l78 .9M1 440l83.17.95"
+                      stroke-linecap="round"/>
+                <path stroke="#3478FF" stroke-width="2"
+                      d="M2 444c26.7-.6 51.4-1.85 77.87-2.75C106.33 440.35 2 444 2 444z" stroke-linecap="round"
+                      stroke-linejoin="round"/>
+                <path stroke="#3478FF" stroke-width="2"
+                      d="M365 306l78 .9m-77-118.73c26 .3 52-.4 78-.1m-78-22.9c26 .3 52-.4 78-.1M180 188l78 .9"
+                      stroke-linecap="round"/>
+                <path stroke="#3478FF" stroke-width="2"
+                      d="M176 308.45c23.63.28 70.88-.3 70.88-.3l8.54 15.16 7.27-16.3M179 438.9c24.08.3 54.73.83 72.23-.3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"/>
+                <path stroke="#3478FF" stroke-width="2" d="M244 427l18.57 11.9-17.53 11.4" stroke-linecap="round"
+                      stroke-linejoin="round"/>
+                <path stroke="#3478FF" stroke-width="2" d="M180.56 164l-.56 24M1.56 300L1 319m364.56-13l-.56 19"
+                      stroke-linecap="round"/>
+                <path stroke="#3478FF" stroke-width="2" d="M80.56 301L80 320l.56-19z" stroke-linecap="round"
+                      stroke-linejoin="round"/>
+                <text fill="#4A4A4A" font-family="OpenSans, Open Sans" font-size="13" transform="translate(1 1)">
+                    <tspan x="191.84" y="224">headline</tspan>
+                </text>
+                <text fill="#4A4A4A" font-family="OpenSans, Open Sans" font-size="13" transform="translate(1 1)">
+                    <tspan x="186.34" y="352">combobox</tspan>
+                </text>
+                <text fill="#4A4A4A" font-family="OpenSans, Open Sans" font-size="13" transform="translate(1 1)">
+                    <tspan x="200.86" y="480">arrow</tspan>
+                </text>
+                <text fill="#4A4A4A" font-family="OpenSans, Open Sans" font-size="13" transform="translate(1 1)">
+                    <tspan x="372.09" y="224">paragraph</tspan>
+                </text>
+                <text fill="#4A4A4A" font-family="OpenSans, Open Sans" font-size="13" transform="translate(1 1)">
+                    <tspan x="383.02" y="352">button</tspan>
+                </text>
+                <text fill="#4A4A4A" font-family="OpenSans, Open Sans" font-size="13" transform="translate(1 1)">
+                    <tspan x="386.97" y="480">erase</tspan>
+                </text>
+                <g stroke="#3478FF" stroke-width="2" stroke-linecap="round">
+                    <path d="M376 65.8c16.1-17.85 22.36-23.32 27.54-28.9C414.44 25.18 412.38 25 431.1 8"/>
+                    <path d="M431.1 65.8c-16.12-17.85-22.37-23.32-27.56-28.9C392.64 25.18 394.7 25 376 8"/>
+                </g>
+                <path stroke="#3478FF" stroke-width="2"
+                      d="M8.46 63C8.8 9.9 9.7 30.54 8 1M7 1l66 .9m-.44-.9L72 65m0-.32c-45.32 1.66-23.66 2.1-65-.68m209.9-1.05c-41.56-3.1-36.13-75.3 17.25-59.26 15.47 4.6 21.6 30.13 14.72 42.7-9.15 16.7-19.33 17.93-33.9 17.93"
+                      stroke-linecap="round"/>
+                <path stroke="#3478FF" stroke-width="2"
+                      d="M374.2 440.35L428.45 405S390 435.23 372.1 452.9c-2.34 2.3 49.7-38.18 65.86-44.76 2.02-.83-53.82 44.77-53.82 44.77"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+        </svg>
+    </div>
+</div>
+</body>
+</html>

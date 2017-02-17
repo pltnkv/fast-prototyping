@@ -1,0 +1,627 @@
+.mockup-prototyping-view table {
+    border-spacing: 0;
+    width: 100%;
+    height: 100%;
+    border-color: inherit;
+}
+
+.mockup-prototyping-view table td {
+    padding: 0;
+}
+
+.mockup-prototyping-view table td:not([align]) {
+    text-align: center;
+}
+
+.mockup-prototyping-view table td:not([valign]) {
+    vertical-align: middle;
+}
+
+.mockup-prototyping-view .border {
+    border: 2px solid;
+    box-sizing: border-box;
+}
+
+.mockup-prototyping-view.border {
+    border: 2px solid;
+    box-sizing: border-box;
+    border-color: inherit;
+}
+
+.mockup-prototyping-view .border-top {
+    border-top: 2px solid;
+}
+
+.mockup-prototyping-view .border-right {
+    border-right: 2px solid;
+}
+
+.mockup-prototyping-view .border-bottom {
+    border-bottom: 2px solid;
+}
+
+.mockup-prototyping-view .border-left {
+    border-left: 2px solid;
+}
+
+.mockup-prototyping-view .ui-textarea,
+.mockup-prototyping-view .collaboration-textarea.editable {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    padding: 12px 10px 8px 10px;
+    border: 2px solid #666666;
+}
+
+.mockup-prototyping-view.checkbox .ui-textarea {
+    top: -20px;
+    left: -20px;
+    width: calc(100% + 40px);
+    height: calc(100% + 40px);
+}
+
+.mockup-prototyping-view .collaboration-textarea.editable {
+    display: none;
+    overflow: auto;
+}
+
+.mockup-prototyping-view .ui-textarea .editable {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: none;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view svg {
+    display: inherit;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view .background-white {
+    background-color: #ffffff;
+}
+
+.mockup-prototyping-view .color-white {
+    color: #ffffff;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view .align-left {
+    text-align: left;
+}
+
+.mockup-prototyping-view .align-center {
+    text-align: center;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view .text {
+    white-space: nowrap;
+}
+
+.mockup-prototyping-view.combobox .text,
+.mockup-prototyping-view.checkbox .text,
+.mockup-prototyping-view.radio .text,
+.mockup-prototyping-view.button .text,
+.mockup-prototyping-view.window .text,
+.mockup-prototyping-view.input .text,
+.mockup-prototyping-view.counter .text,
+.mockup-prototyping-view.classes .text,
+.mockup-prototyping-view.search .text {
+    padding: 0 10px;
+}
+
+.mockup-prototyping-view.dialog .text,
+.mockup-prototyping-view.ask-window .text {
+    padding: 10px;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view .rounded {
+    border-radius: 10px;
+}
+
+.mockup-prototyping-view .rounded--not-top-left,
+.mockup-prototyping-view .rounded.not-top-left {
+    border-top-left-radius: 0 !important;
+}
+
+.mockup-prototyping-view .rounded--not-top-right,
+.mockup-prototyping-view .rounded.not-top-right {
+    border-top-right-radius: 0 !important;
+}
+
+.mockup-prototyping-view .rounded--not-bottom-left,
+.mockup-prototyping-view .rounded.not-bottom-left {
+    border-bottom-left-radius: 0 !important;
+}
+
+.mockup-prototyping-view .rounded--not-bottom-right,
+.mockup-prototyping-view .rounded.not-bottom-right {
+    border-bottom-right-radius: 0 !important;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view .position-relative {
+    position: relative;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view .font-size-14 {
+    font-size: 14px;
+}
+
+.mockup-prototyping-view .font-size-16 {
+    font-size: 16px;
+}
+
+.mockup-prototyping-view .font-size-17 {
+    font-size: 17px;
+}
+
+.mockup-prototyping-view .font-size-19 {
+    font-size: 19px;
+}
+
+.mockup-prototyping-view .font-size-20 {
+    font-size: 20px;
+}
+
+.mockup-prototyping-view .font-size-22 {
+    font-size: 22px;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view.dialog table {
+    height: calc(100% - 15px);
+}
+
+.mockup-prototyping-view.dialog .ear {
+    padding-top: -2px;
+    padding-left: 170px;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view.chrome .tabs {
+    height: 25px;
+    background-color: transparent;
+}
+
+.mockup-prototyping-view.chrome .tabs-wrapper {
+    width: auto;
+    empty-cells: show;
+}
+
+.mockup-prototyping-view.chrome .separator,
+.mockup-prototyping-view.chrome .tab {
+    display: inline-block;
+    float: left;
+    height: 100%;
+}
+
+.mockup-prototyping-view.chrome .separator {
+    width: 8px;
+}
+
+.mockup-prototyping-view.chrome .tab {
+    text-align: center;
+    min-width: 70px;
+    background-color: #a9cbeb;
+    line-height: 30px;
+    padding: 0 8px;
+    margin-left: 10px;
+    box-sizing: border-box;
+    color: #ffffff;
+    font-size: 17px;
+    white-space: nowrap;
+}
+
+.mockup-prototyping-view.chrome .tab.first {
+    width: 100%;
+    margin-left: 0;
+    background-color: transparent;
+    color: #6699ff;
+}
+
+.mockup-prototyping-view.chrome .tab.copy {
+    margin-left: 0;
+}
+
+.mockup-prototyping-view.chrome .fake-border-top,
+.mockup-prototyping-view.chrome .fake-border-right {
+    position: relative;
+    background-color: #ffffff;
+}
+
+.mockup-prototyping-view.chrome .fake-border-top {
+    width: calc(100% - 1px);
+    height: 4px;
+    margin-top: -2px;
+}
+
+.mockup-prototyping-view.chrome .fake-border-right {
+    height: calc(100% - 1px);
+    width: 4px;
+    margin: -1px -2px 0 0;
+    float: right;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view.search svg {
+    margin-left: 10px;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view.ask-window .button {
+    width: 70px;
+    height: 30px;
+    display: inline-block;
+    line-height: 30px;
+    margin: 0 10px 10px;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view.group table {
+    height: 100%;
+    padding-top: 10px;
+}
+
+.mockup-prototyping-view.group td {
+    vertical-align: top;
+}
+
+.mockup-prototyping-view.group .text {
+    margin: -10px 0 0 0;
+    padding: 0 10px 30px;
+}
+
+.mockup-prototyping-view.group .corner {
+    min-width: 15px;
+    width: 50%;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view.classes tr:last-child td {
+    border-bottom: 2px solid;
+}
+
+.mockup-prototyping-view.classes td {
+    padding: 5px 25px 5px 0;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view.loading div {
+    width: 100%;
+    height: 100%;
+}
+
+.mockup-prototyping-view.loading .background-white {
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.mockup-prototyping-view.loading .background-blue {
+    background-color: blue;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view.stroke .background {
+    width: 100%;
+    height: 100%;
+}
+
+/* ======================= */
+
+.mockup-prototyping-view.menu table {
+    width: auto;
+}
+
+.mockup-prototyping-view.menu .tab {
+    min-width: 50px;
+    font-size: 12px;
+    margin-right: 2px;
+    height: 25px;
+    line-height: 25px;
+    margin-left: 0;
+}
+
+.mockup-prototyping-view.menu td:last-child .tab {
+    margin-right: 0;
+}
+
+/* ======================= */
+
+.mockup-prototyping-shape-view .text {
+    white-space: normal;
+}
+
+/* ======================= */
+
+.mockup-view-2016 td {
+    position: relative;
+}
+
+.mockup-view-2016 .artefact {
+    position: absolute;
+}
+
+.mockup-view-2016 .artefact.artefact--top,
+.mockup-view-2016 .artefact.artefact--bottom {
+    width: 100%;
+    height: 2px;
+}
+
+.mockup-view-2016 .artefact.artefact--right,
+.mockup-view-2016 .artefact.artefact--left {
+    width: 2px;
+    height: 100%;
+    top: 0;
+}
+
+.mockup-view-2016 .artefact.artefact--top {
+    top: -1px;
+}
+
+.mockup-view-2016 .artefact.artefact--right {
+    right: -1px;
+}
+
+.mockup-view-2016 .artefact.artefact--bottom {
+    bottom: -1px;
+}
+
+.mockup-view-2016 .artefact.artefact--left {
+    left: -1px;
+}
+
+.mockup-view-2016 .rounded {
+    border-radius: 4px;
+}
+
+.mockup-view-2016.search-2016 .text {
+    padding: 0 20px;
+}
+
+.mockup-view-2016.select-2016 .text {
+    padding-left: 10px;
+}
+
+.mockup-view-2016.modal-2016 .button {
+    width: 120px;
+    height: 40px;
+    line-height: 40px;
+    margin: 0 10px 10px;
+    display: inline-block;
+}
+
+.mockup-view-2016.modal-2016 .text {
+    padding: 0 40px 30px;
+}
+
+.mockup-view-2016.modal-2016 .button {
+    margin-bottom: 20px;
+}
+
+.mockup-view-2016.button.button--round .rounded {
+    border-radius: 20px;
+}
+
+.mockup-view-2016.loading-2016 .loading-2016-background {
+    width: 100%;
+    height: 100%;
+    padding: 3px;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+
+.mockup-view-2016.loading-2016 .loading-2016-loader {
+    width: 60%;
+    height: 100%;
+}
+
+.mockup-view-2016.chrome .tabs {
+    height: 42px;
+    position: relative;
+}
+
+.mockup-view-2016.chrome .tabs-wrapper {
+    margin-right: 6px;
+}
+
+.mockup-view-2016.chrome .angle {
+    left: -2px;
+    bottom: -2px;
+    width: 10px;
+    height: 10px;
+    z-index: 10;
+    border-radius: 2px;
+}
+
+.mockup-view-2016.chrome .separator {
+    width: 4px;
+}
+
+.mockup-view-2016.chrome .tab {
+    padding: 0 20px;
+    font-size: 14px;
+    min-width: 130px;
+    line-height: 42px;
+    margin-left: 4px;
+    margin-bottom: -2px;
+}
+
+.mockup-view-2016.chrome .artefact.artefact--bottom {
+    width: 3px;
+    bottom: 0;
+    right: -2px;
+}
+
+.mockup-view-2016.chrome .artefact.artefact--left {
+    top: -4px;
+    left: -2px;
+    height: 3px;
+}
+
+.mockup-view-2016.scroll-2016 .scroll-2016-background {
+    width: 100%;
+    height: 100%;
+    padding: 30px 2px 0;
+    box-sizing: border-box;
+}
+
+.mockup-view-2016.scroll-2016 .scroll-2016-loader {
+    height: 80px;
+}
+
+.mockup-view-2016.dialog-2016 .text {
+    padding: 20px 20px 35px 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.mockup-view-2016.dialog-2016 svg {
+    position: absolute;
+    top: 0;
+}
+
+.mockup-view-2016.menu-2016 table {
+    width: 100%;
+    height: 100%;
+}
+
+.mockup-view-2016.menu-2016 td:first-of-type .tab {
+    border-radius: 4px 0 0 4px;
+}
+
+.mockup-view-2016.menu-2016 td:last-of-type .tab {
+    border-radius: 0 4px 4px 0;
+}
+
+.mockup-view-2016.menu-2016 .tab {
+    min-width: 65px;
+    height: 40px;
+    font-size: 14px;
+    line-height: 40px;
+    padding: 0 10px;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.mockup-view-2016.media-player-2016 .time {
+    width: 60%;
+    height: 4px;
+    margin-left: 20px;
+}
+
+.mockup-view-2016.browser-2016 .search {
+    width: calc(100% - 2px);
+    height: 20px;
+    margin: 10px 0 0 1px;
+}
+
+.mockup-view-2016.browser-2016 svg,
+.mockup-view-2016.media-player-2016 svg {
+    margin: 15px 14px 0 0;
+}
+
+.mockup-view-2016.browser-2016 td:last-of-type svg,
+.mockup-view-2016.browser-2016 td:first-of-type svg,
+.mockup-view-2016.media-player-2016 td:last-of-type svg,
+.mockup-view-2016.media-player-2016 td:first-of-type svg {
+    margin-left: 14px;
+}
+
+.mockup-view-2016--multiline > table {
+    table-layout: fixed;
+}
+
+.mockup-view-2016--multiline .text {
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.mockup-view-2016.select-2016 svg,
+.mockup-view-2016.counter-2016 svg {
+    display: inline-block;
+}
+
+.mockup-view-2016.counter-2016 svg {
+    padding-top: 3px;
+}
+
+.mockup-prototyping-view.full-size {
+    width: 100%;
+    height: 100% !important;
+}
+
+.mockup-prototyping-view.circle {
+    border-radius: 50%;
+}
+
+.mockup-prototyping-view.line {
+    border-top: 2px solid;
+    border-color: inherit;
+    margin: 4px;
+}
+
+.mockup-prototyping-view.v-line {
+    border-left: 2px solid;
+    border-color: inherit;
+    height: 100%;
+}
+
+.mockup-prototyping-view.textline {
+    overflow: hidden;
+    text-overflow: clip;
+    width: 100%;
+    height: 16px;
+}
+
+.mockup-prototyping-view.headline {
+    height: 32px;
+    margin: 0;
+}
+
+svg.mockup-prototyping-view {
+    color: inherit;
+}
+
+.mockup-prototyping-view.arrow {
+    height: 50%;
+    border-bottom: 2px solid;
+}
+
+.mockup-prototyping-view.arrow:after {
+    left: calc(100% - 8px);
+    top: calc(50% - 4px);
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-left-color: inherit;
+    border-width: 10px;
+    border-top-width: 5px;
+    border-bottom-width: 5px;
+}
