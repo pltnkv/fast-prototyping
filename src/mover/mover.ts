@@ -182,6 +182,7 @@ export function init(_stage) {
             console.log('needToSelect', needToSelect)
             //todo cancel edit mode
             if (needToSelect) {
+                // todo вынести из этого файла принятие решение о том надо выделять виджет или нет.
                 selectCallback(touchStartX, touchStartY)
                 stopDrawCallback(true)
             } else if (!moveWidgetMode && !editMode) {
@@ -333,13 +334,6 @@ function setPositionScale(x:number, y:number, scale:number):void {
     currentX = x
     currentY = y
 }
-
-
-// let debug = document.getElementById('debug')
-//
-// function log(text:string) {
-// 	debug.innerHTML = text
-// }
 
 //utils
 

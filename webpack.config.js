@@ -24,6 +24,7 @@ module.exports = {
 			// lodash$: path.resolve('./static/scripts/general/lodash.min.js'),
 			jquery: path.resolve('./libs/jquery-3.1.1.min.js'),
 			signals: path.resolve('./static/scripts/signals.min.js'),
+			log: path.resolve('./libs/rtb-logger.js'),
 		}
 	},
 
@@ -45,21 +46,24 @@ module.exports = {
 		]
 	},
 
-	devtool: 'inline-source-map',
+	// devtool: 'inline-source-map',
 
 	plugins: [
 		new webpack.NoErrorsPlugin(),
 		new HtmlWebpackPlugin({
 			filename: 'index.html',
-			template: './index.html'
+			template: './index.html',
+			chunks: ['main']
 		}),
 		new HtmlWebpackPlugin({
 			filename: 'editor.html',
-			template: './editor.html'
+			template: './editor.html',
+			chunks: ['editor']
 		}),
 		new webpack.ProvidePlugin({
 			$: 'jquery',
-			signals: 'signals'
+			signals: 'signals',
+			log: 'log'
 		})
 	],
 

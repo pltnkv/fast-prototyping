@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "target": "ES6"
+  },
+  "include": [
+    "./**/*"
+  ],
+  "files": [
+    "../types/polyfills/Array.d.ts",
+    "../types/polyfills/String.d.ts",
+    "../types/logger.d.ts",
+    "../types/require.d.ts",
+    "../types/jquery.d.ts",
+    "../types/NDollarRecognizer.d.ts"
+  ]
+}
