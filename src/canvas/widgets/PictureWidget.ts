@@ -36,7 +36,7 @@ export default class PictureWidget extends BaseWidget {
                 let input:any = this.getElement().find(('.file-input-pic'))[0]
                 if (input.files && input.files[0]) {
                     var reader = new FileReader();
-                    reader.onload = (e) => {
+                    reader.onload = (e:any) => {
                         this.getElement().find(('.img-container'))
                             .css({
                                 display: 'block',

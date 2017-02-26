@@ -1,8 +1,8 @@
+import IPoint from "./mover/types/IPoint";
 let r1
 let r2
 
-function Point(x, y) // constructor
-{
+function Point(x, y) {
     this.X = x;
     this.Y = y;
 }
@@ -88,15 +88,15 @@ export function init() {
     ])
 }
 
-export function recognize(strokes) {
-    console.log(strokes.length)
+export function recognize(strokes:IPoint[][]) {
+    let $strokes = strokes.map(stroke => stroke.map(point => ({X: point.x, Y: point.y})))
     if (strokes.length === 1) {
-        return r1.Recognize(strokes,
+        return r1.Recognize($strokes,
             false, //useBoundedRotationInvariance
             false, //requireSameNoOfStrokes
             false); //useProtractor
     } else {
-        return r2.Recognize(strokes,
+        return r2.Recognize($strokes,
             false, //useBoundedRotationInvariance
             false, //requireSameNoOfStrokes
             false); //useProtractor

@@ -8,10 +8,10 @@ export default class UIController {
     constructor(widgetsController:WidgetsController) {
         this.uiHandler = {
             onDelete: () => {
-                widgetsController.removeWidget(widgetsController.getSelectedWidget())
+                widgetsController.removeWidget(widgetsController.getSelectedWidget()!)
             },
             onSetColor: (color) => {
-                widgetsController.getSelectedWidget().setColor(color)
+                widgetsController.getSelectedWidget()!.setColor(color)
             }
         }
 

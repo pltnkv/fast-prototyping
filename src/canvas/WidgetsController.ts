@@ -16,15 +16,14 @@ import UIController from "../ui/UIController"
 
 import IRect from "./mover/types/IRect"
 import WidgetTypes from "./widgets/WidgetTypes"
-import InputsHandler from "./InputsHandler";
-import * as mover from "./mover/mover"
+import InputsHandler from "./InputsHandler"
 
 export default class WidgetsController {
 
     private ui:UIController
     private widgetConstructors
     private widgets:BaseWidget[] = []
-    private selectedWidget:BaseWidget = null
+    private selectedWidget:BaseWidget | null
 
     inputsHandler:InputsHandler
 
@@ -69,7 +68,7 @@ export default class WidgetsController {
 
     private attachWidget(w:BaseWidget) {
         let baseContainer = document.getElementById('baseContainer')
-        $(baseContainer).append(w.getElement())
+        $(baseContainer!).append(w.getElement())
     }
 
     getWidgetUnderPoint(x:number, y:number):BaseWidget {

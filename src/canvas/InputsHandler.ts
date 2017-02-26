@@ -4,6 +4,7 @@ import IInputsHandlerEvent from "./mover/IInputsHandlerEvent";
 import BaseWidget from "./widgets/BaseWidget";
 import * as mover from "./mover/mover"
 import {discreteRound} from "./mover/utils";
+import {clearPrevBounds} from "./smartGrid";
 
 const DOUBLE_TOUCH_TIME = 350
 const MOVE_STEP = 10
@@ -24,7 +25,7 @@ export default class InputsHandler implements IInputsHandler {
     private continueDrawCallback
     private stopDrawCallback
 
-    private mode:HandlerMode = HandlerMode.DRAW
+    private mode:HandlerMode = HandlerMode.DISABLED
 
     private needToSelect = false
     private prevTouchTime:number
@@ -85,7 +86,7 @@ export default class InputsHandler implements IInputsHandler {
             case HandlerMode.DRAW:
                 this.continueDrawCallback(e.x, e.y)
 
-                const THRESHOLD = 5
+                const THRESHOLD = 4
                 if (this.needToSelect && (Math.abs(e.x - this.touchStartX) > THRESHOLD || Math.abs(e.y - this.touchStartY) > THRESHOLD)) {
                     this.deselectWidget()
                     this.needToSelect = false
@@ -105,6 +106,7 @@ export default class InputsHandler implements IInputsHandler {
         log.log('w', 'onTouchEnd')
         if (this.needToSelect) {
             this.selectWidget(this.touchStartX, this.touchStartY)
+            // todo для точки this.needToSelect равен true
             this.stopDrawCallback(true)
         } else if (this.mode === HandlerMode.DRAW) {
             this.stopDrawCallback()
@@ -130,6 +132,7 @@ export default class InputsHandler implements IInputsHandler {
         let newX = mover.getScreenToCanvasX(x) - this.savedOffsetX
         let newY = mover.getScreenToCanvasY(y) - this.savedOffsetY
         widget.setPosition(discreteRound(newX, MOVE_STEP), discreteRound(newY, MOVE_STEP))
+        clearPrevBounds()
     }
 
 
@@ -141,6 +144,7 @@ export default class InputsHandler implements IInputsHandler {
             discreteRound(newWidth, MOVE_STEP),
             discreteRound(newHeight, MOVE_STEP)
         )
+        clearPrevBounds()
     }
 
     private saveOffsetForWidget(w:BaseWidget, x:number, y:number) {

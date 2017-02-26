@@ -2,7 +2,10 @@ import WidgetsController from "./WidgetsController"
 import * as mover from "./mover/mover"
 import WidgetTypes from "./widgets/WidgetTypes"
 import * as gestures from "./gestures"
-import {discreteRound} from "./mover/utils"
+import IRect from "./mover/types/IRect";
+import {correctBounds, getBounds, savePrevBounds} from "./smartGrid";
+import IPoint from "./mover/types/IPoint";
+import {distanceSqr} from "./mover/PointUtils";
 
 const simplify = require('simplify-js')
 
@@ -37,14 +40,12 @@ const finalizedGestures = [
 
 let widgetsController:WidgetsController
 let isNewGesture = true
-let _points, _strokes, _g, _rc
+let _points:IPoint[]
+let _strokes:IPoint[][]
+let _g:CanvasRenderingContext2D
+let _rc:IRect
 
-function Point(x, y) {
-    this.X = x
-    this.Y = y
-    this.x = x
-    this.y = y
-}
+let timeoutId:number
 
 export function initRecognizer(_widgetsController:WidgetsController) {
     gestures.init()
@@ -69,14 +70,14 @@ function onStart(_x, _y) {
     if (isNewGesture) {
         _points.length = 0
         _strokes.length = 0
-
     }
+
     const clr = "#6699FF"
     _g.strokeStyle = clr
     _g.fillStyle = clr
 
     isNewGesture = false
-    _points[0] = new Point(x, y)
+    _points[0] = {x, y}
     _g.fillRect(x - 1, y - 1, 2, 2)
 
     clearTimeout(timeoutId)
@@ -84,25 +85,24 @@ function onStart(_x, _y) {
 
 function onContinue(_x, _y) {
     log.log('drw', 'onContinue')
-    let {x, y} = getPosition(_x, _y)
-    _points[_points.length] = new Point(x, y) // append
+    _points[_points.length] = getPosition(_x, _y) // append
     drawConnectedPoint(_points.length - 2, _points.length - 1)
 }
 
-let timeoutId
 
 function onStop(cancel:boolean) {
+    console.log('onStop', cancel)
     log.log('drw', 'onStop', cancel)
-    //todo start simplify from here
+    // todo start simplify from here
+    // todo распознавать точку как отдельный элемент ввода
     if (!cancel) {
+        console.log('isPoint', isPoint(_points))
+        log.log('t', 'isPoint', isPoint(_points))
         _strokes.push(_points.slice()) // add new copy to set
         drawSimplifiedStroke(_points.slice())
 
         let res = recognize()
         log.log('drw', 'res.Name', res.Name, res.Score)
-        if(typeof res.Name !== 'string') {
-            return
-        }
 
         if (res.Name && res.Score > coefficients[res.Name] && finalizedGestures.includes(res.Name)) {
             tryCreateWidget(res)
@@ -121,30 +121,11 @@ function onStop(cancel:boolean) {
     _points.length = 0
 }
 
-function drawSimplifiedStroke(_points) {
-    log.log('drw', '_points.length', _points.length)
-    if (_points.length >= 2) {
-        let simplPoints = simplify(_points, 10)
-        log.log('drw', 'simplPoints.length', simplPoints.length)
-
-        let clr = "#990000"
-        _g.beginPath();
-        _g.strokeStyle = clr
-        _g.fillStyle = clr
-        _g.moveTo(simplPoints[0].x, simplPoints[0].y)
-        for (let i = 1; i < simplPoints.length; i++) {
-            _g.lineTo(simplPoints[i].x, simplPoints[i].y)
-        }
-        _g.stroke()
-    }
-}
-
-let prevBounds
-
 function tryCreateWidget(res) {
     log.log('drw', 'tryCreateWidget')
     console.info(res)
-    let bounds = getBounds()
+    let bounds = getBounds(_strokes)
+    //drawBoundingBox(bounds)
     if ((bounds.width >= 50 || bounds.height >= 50)
         && res.Score > coefficients[res.Name]) {
         if (res.Name === WidgetTypes.ERASE) {
@@ -155,9 +136,9 @@ function tryCreateWidget(res) {
                 widgetsController.removeWidget(widget)
             }
         } else {
-            //let correctedBounds = correctBounds(prevBounds, bounds)
-            widgetsController.createWidget(res.Name, bounds, {name: `${res.Name} (${round(res.Score, 2)})`})
-            prevBounds = bounds
+            let correctedBounds = correctBounds(bounds)
+            widgetsController.createWidget(res.Name, correctedBounds, {name: `${res.Name} (${round(res.Score, 2)})`})
+            savePrevBounds(correctedBounds)
         }
     }
     clearRect()
@@ -180,71 +161,12 @@ function clearPoints() {
     isNewGesture = true
 }
 
-function getBounds() {
-    let leftX = Number.MAX_VALUE
-    let rightX = Number.MIN_VALUE
-    let topY = Number.MAX_VALUE
-    let bottomY = Number.MIN_VALUE
-
-    for (let i = 0; i < _strokes.length; i++) {
-        let stroke = _strokes[i]
-        for (let j = 0; j < stroke.length; j++) {
-            let point = stroke[j]
-
-            if (point.X < leftX) {
-                leftX = point.X
-            }
-
-            if (point.X > rightX) {
-                rightX = point.X
-            }
-
-            if (point.Y < topY) {
-                topY = point.Y
-            }
-
-            if (point.Y > bottomY) {
-                bottomY = point.Y
-            }
-        }
-    }
-    return {
-        x: discreteRound(leftX, STEP),
-        y: discreteRound(topY, STEP),
-        width: discreteRound(rightX - leftX, STEP),
-        height: discreteRound(bottomY - topY, STEP)
-    }
-}
-
-const STEP = 20
-
-function correctBounds(prevBounds, newBounds) {
-    if (!prevBounds) {
-        return newBounds
-    }
-
-    if (Math.abs(prevBounds.x - newBounds.x) < STEP + 1) {
-        newBounds.x = prevBounds.x
-        if (Math.abs(prevBounds.width - newBounds.width) < STEP + 1) {
-            newBounds.width = prevBounds.width
-        }
-    }
-
-    if (Math.abs(prevBounds.y - newBounds.y) < STEP + 1) {
-        newBounds.y = prevBounds.y
-        if (Math.abs(prevBounds.height - newBounds.height) < STEP + 1) {
-            newBounds.height = prevBounds.height
-        }
-    }
-
-    return newBounds
-}
 
 ////////////////////////////////////////////////////////////
 // utils
 ////////////////////////////////////////////////////////////
 
-function getPosition(clientX, clientY) {
+function getPosition(clientX, clientY):IPoint {
     return {
         x: mover.getScreenToCanvasX(clientX),
         y: mover.getScreenToCanvasY(clientY)
@@ -253,14 +175,14 @@ function getPosition(clientX, clientY) {
 
 function drawConnectedPoint(from, to) {
     _g.beginPath()
-    _g.moveTo(_points[from].X, _points[from].Y)
-    _g.lineTo(_points[to].X, _points[to].Y)
+    _g.moveTo(_points[from].x, _points[from].y)
+    _g.lineTo(_points[to].x, _points[to].y)
     _g.closePath()
     _g.stroke()
 }
 
 function clearRect() {
-    _g.clearRect(0, 0, _rc.width, _rc.height)
+    // _g.clearRect(0, 0, _rc.width, _rc.height)
 }
 
 function getCanvasRect(canvas) {
@@ -281,4 +203,44 @@ function getCanvasRect(canvas) {
 function round(n, d) {
     d = Math.pow(10, d)
     return Math.round(n * d) / d
+}
+
+
+const POINT_DISTANCE_THRESHOLD = Math.sqrt(2)
+
+function isPoint(stroke:IPoint[]):boolean {
+    return stroke.length === 1
+        || stroke.length <= 4 && distanceSqr(stroke[0], stroke[stroke.length-1]) < POINT_DISTANCE_THRESHOLD
+}
+
+////////////////////////////////////////////////////////////
+// DEBUG
+////////////////////////////////////////////////////////////
+
+
+function drawSimplifiedStroke(_points) {
+    log.log('drw', '_points.length', _points.length)
+    if (_points.length >= 2) {
+        let simplPoints = simplify(_points, 10)
+        log.log('drw', 'simplPoints.length', simplPoints.length)
+
+        let clr = "#990000"
+        _g.beginPath();
+        _g.strokeStyle = clr
+        _g.fillStyle = clr
+        _g.moveTo(simplPoints[0].x, simplPoints[0].y)
+        for (let i = 1; i < simplPoints.length; i++) {
+            _g.lineTo(simplPoints[i].x, simplPoints[i].y)
+        }
+        _g.stroke()
+    }
+}
+
+
+function drawBoundingBox(rect:IRect) {
+    let clr = "#0a9900"
+    _g.beginPath();
+    _g.rect(rect.x, rect.y, rect.width, rect.height)
+    _g.strokeStyle = clr
+    _g.stroke()
 }

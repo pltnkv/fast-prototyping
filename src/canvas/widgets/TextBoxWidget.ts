@@ -1,5 +1,4 @@
 import BaseWidget from "./BaseWidget"
-import hasJavaScriptFileExtension = ts.hasJavaScriptFileExtension
 
 const template = () => `
 <div class="mockup-view mockup-view-2016 mockup-prototyping-view input mockup-view-2016--multiline full-size">

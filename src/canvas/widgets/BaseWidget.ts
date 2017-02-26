@@ -10,12 +10,14 @@ export default class BaseWidget {
     private pos = {x: 0, y: 0}
     protected size = {width: 0, height: 0}
 
-    constructor(width?:number, height?:number, color?:string, lockedHeight = 0) {
+    constructor(width:number, height:number, color?:string, lockedHeight = 0) {
         this.lockedHeight = lockedHeight
         this.element = this.createWrapperElement()
         this.contextMenuButton = this.createContextMenuButton()
         this.setSize(width, height)
-        this.setColor(color)
+        if (color) {
+            this.setColor(color)
+        }
     }
 
     private createWrapperElement():JQuery {

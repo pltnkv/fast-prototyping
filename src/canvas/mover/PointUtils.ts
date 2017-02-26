@@ -20,6 +20,14 @@ export const subtract = (p1:IPoint, p2:IPoint):IPoint => ({
     y: p1.y - p2.y
 })
 
+// distance between two points
+export const distanceSqr = (p1:IPoint, p2:IPoint):number => {
+    let dx = p2.x - p1.x
+    let dy = p2.y - p1.y
+    return dx * dx + dy * dy
+}
+
 export const length = (p:IPoint):number => Math.sqrt(p.x * p.x + p.y * p.y)
 
 export const clone = (p:IPoint):IPoint => ({x: p.x, y: p.y})
+

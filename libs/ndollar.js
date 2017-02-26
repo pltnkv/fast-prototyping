@@ -110,7 +110,7 @@
 			var u = -1;
 			for (var i = 0; i < this.Multistrokes.length; i++) // for each multistroke
 			{
-				if (!requireSameNoOfStrokes || strokes.length == this.Multistrokes[i].NumStrokes) // optional -- only attempt match when same # of component strokes
+				if (!requireSameNoOfStrokes || strokes.length === this.Multistrokes[i].NumStrokes) // optional -- only attempt match when same # of component strokes
 				{
 					for (var j = 0; j < this.Multistrokes[i].Unistrokes.length; j++) // each unistroke within this multistroke
 					{
@@ -132,13 +132,13 @@
 					}
 				}
 			}
-			return (u == -1) ? new Result("No match.", 0.0) : new Result(this.Multistrokes[u].Name, useProtractor ? 1.0 / b : 1.0 - b / HalfDiagonal);
+			return (u === -1) ? new Result("No match.", 0.0) : new Result(this.Multistrokes[u].Name, useProtractor ? 1.0 / b : 1.0 - b / HalfDiagonal);
 		};
 		this.AddGesture = function (name, useBoundedRotationInvariance, strokes) {
 			this.Multistrokes[this.Multistrokes.length] = new Multistroke(name, useBoundedRotationInvariance, strokes);
 			var num = 0;
 			for (var i = 0; i < this.Multistrokes.length; i++) {
-				if (this.Multistrokes[i].Name == name) {
+				if (this.Multistrokes[i].Name === name) {
 					num++;
 				}
 			}
@@ -154,13 +154,13 @@
 // Private helper functions from this point down
 //
 	function HeapPermute(n, order, /*out*/ orders) {
-		if (n == 1) {
+		if (n === 1) {
 			orders[orders.length] = order.slice(); // append copy
 		}
 		else {
 			for (var i = 0; i < n; i++) {
 				HeapPermute(n - 1, order, orders);
-				if (n % 2 == 1) // swap 0, n-1
+				if (n % 2 === 1) // swap 0, n-1
 				{
 					var tmp = order[0];
 					order[0] = order[n - 1];
@@ -177,14 +177,14 @@
 	}
 
 	function MakeUnistrokes(strokes, orders) {
-		var unistrokes = new Array(); // array of point arrays
+		var unistrokes = []; // array of point arrays
 		for (var r = 0; r < orders.length; r++) {
 			for (var b = 0; b < Math.pow(2, orders[r].length); b++) // use b's bits for directions
 			{
-				var unistroke = new Array(); // array of points
+				var unistroke = []; // array of points
 				for (var i = 0; i < orders[r].length; i++) {
 					var pts;
-					if (((b >> i) & 1) == 1) {  // is b's bit at index i on?
+					if (((b >> i) & 1) === 1) {  // is b's bit at index i on?
 						pts = strokes[orders[r][i]].slice().reverse(); // copy and reverse
 					} else {
 						pts = strokes[orders[r][i]].slice(); // copy
@@ -200,7 +200,7 @@
 	}
 
 	function CombineStrokes(strokes) {
-		var points = new Array();
+		var points = [];
 		for (var s = 0; s < strokes.length; s++) {
 			for (var p = 0; p < strokes[s].length; p++) {
 				points[points.length] = new Point(strokes[s][p].X, strokes[s][p].Y);
@@ -227,7 +227,7 @@
 				D += d;
 			}
 		}
-		if (newpoints.length == n - 1) // somtimes we fall a rounding-error short of adding the last point, so add it if so
+		if (newpoints.length === n - 1) // somtimes we fall a rounding-error short of adding the last point, so add it if so
 		{
 			newpoints[newpoints.length] = new Point(points[points.length - 1].X, points[points.length - 1].Y);
 		}
@@ -244,7 +244,7 @@
 		var c = Centroid(points);
 		var cos = Math.cos(radians);
 		var sin = Math.sin(radians);
-		var newpoints = new Array();
+		var newpoints = [];
 		for (var i = 0; i < points.length; i++) {
 			var qx = (points[i].X - c.X) * cos - (points[i].Y - c.Y) * sin + c.X
 			var qy = (points[i].X - c.X) * sin + (points[i].Y - c.Y) * cos + c.Y;
@@ -257,7 +257,7 @@
 	{
 		var B = BoundingBox(points);
 		var uniformly = Math.min(B.Width / B.Height, B.Height / B.Width) <= ratio1D; // 1D or 2D gesture test
-		var newpoints = new Array();
+		var newpoints = [];
 		for (var i = 0; i < points.length; i++) {
 			var qx = uniformly ? points[i].X * (size / Math.max(B.Width, B.Height)) : points[i].X * (size / B.Width);
 			var qy = uniformly ? points[i].Y * (size / Math.max(B.Width, B.Height)) : points[i].Y * (size / B.Height);
@@ -269,7 +269,7 @@
 	function TranslateTo(points, pt) // translates points' centroid
 	{
 		var c = Centroid(points);
-		var newpoints = new Array();
+		var newpoints = [];
 		for (var i = 0; i < points.length; i++) {
 			var qx = points[i].X + pt.X - c.X;
 			var qy = points[i].Y + pt.Y - c.Y;
@@ -289,7 +289,7 @@
 			sin = Math.sin(baseOrientation - iAngle);
 		}
 		var sum = 0.0;
-		var vector = new Array();
+		var vector = [];
 		for (var i = 0; i < points.length; i++) {
 			var newX = points[i].X * cos - points[i].Y * sin;
 			var newY = points[i].Y * cos + points[i].X * sin;
@@ -369,7 +369,7 @@
 	function PathDistance(pts1, pts2) // average distance between corresponding points in two paths
 	{
 		var d = 0.0;
-		for (var i = 0; i < pts1.length; i++) // assumes pts1.length == pts2.length
+		for (var i = 0; i < pts1.length; i++) // assumes pts1.length === pts2.length
 		{
 			d += Distance(pts1[i], pts2[i]);
 		}
