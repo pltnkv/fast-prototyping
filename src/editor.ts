@@ -1,8 +1,8 @@
-import * as mover from "./mover/mover"
-import {initRecognizer} from "./recognizer"
-import WidgetsController from "./widgets/WidgetsController"
-import BaseWidget from "./widgets/BaseWidget"
-import {discreteRound} from "./mover/utils"
+import * as mover from "./canvas/mover/mover"
+import {initRecognizer} from "./canvas/drawer"
+import WidgetsController from "./canvas/WidgetsController"
+import BaseWidget from "./canvas/widgets/BaseWidget"
+import {discreteRound} from "./canvas/mover/utils"
 import * as contextMenu from "./ui/ContextMenu"
 /*
  let stage = document.getElementById('baseContainer')
@@ -17,7 +17,7 @@ import * as contextMenu from "./ui/ContextMenu"
  // selection and movement
 
  mover.setSelectWidgetCallback((x, y) => {
- widgetsController.unselectSelectedWidget()
+ widgetsController.deselectSelectedWidget()
  let w = widgetsController.getWidgetUnderPoint(x, y)
  if (w) {
  widgetsController.selectWidget(w)
@@ -26,7 +26,7 @@ import * as contextMenu from "./ui/ContextMenu"
  })
 
  mover.setUnselectWidgetCallback(() => {
- widgetsController.unselectSelectedWidget()
+ widgetsController.deselectSelectedWidget()
  contextMenu.hideContextMenu()
  })
 

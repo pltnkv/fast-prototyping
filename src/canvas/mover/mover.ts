@@ -1,4 +1,6 @@
 import * as utils from "./utils"
+import {IInputsHandler} from "./IInputsHandler";
+import IInputsHandlerEvent from "./IInputsHandlerEvent";
 
 const WHEEL_EVENT_NAME = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel'
 const DEFAULT_SCALE = 0.4
@@ -10,29 +12,27 @@ const limits = {
     maxScale: DEFAULT_MAX_SCALE
 }
 
+const MIDDLE_BUTTON_CODE = 1
+
 let currentX = 0
 let currentY = 0
 let currentScale = 1
 
 let stage
+let handler:IInputsHandler
 
 let touchMode = false
-let inEventProcessing = false
 let startedZooming = false
 let inMultiToucheMode = false
 let initTouchesDistance:number
 let initScale:number
 let prevMultiTouchCenterX:number
 let prevMultiTouchCenterY:number
-let startDrawCallback
-let continueDrawCallback
-let stopDrawCallback
-let selectCallback
-let unselectCallback
-let isClickBySelectedWidgetCallback
-let moveWidgetCallback
-let saveOffsetForMovedWidget
-let startEditMode
+
+
+export function setInputsHandler(inputsHandler:IInputsHandler) {
+    handler = inputsHandler
+}
 
 /**
  * Подписываемся на мышиные и тач-события для перемещения доски
@@ -64,40 +64,32 @@ export function init(_stage) {
     ///////////////////////////////////////////
 
     function onMouseDown(e) {
-        if (!inEventProcessing) {
-            if (e.ctrlKey) {
-                startDrawCallback(e.clientX, e.clientY)
-            } else {
-                inEventProcessing = true
-                touchMode = false
-                offsetX = e.clientX - currentX
-                offsetY = e.clientY - currentY
-            }
-            document.addEventListener('mousemove', onMouseMove)
-            document.addEventListener('mouseup', onMouseUp)
+        if (e.ctrlKey || e.button === MIDDLE_BUTTON_CODE) {
+            touchMode = false
+            offsetX = e.clientX - currentX
+            offsetY = e.clientY - currentY
+            e.preventDefault()
+        } else {
+            handler.onTouchStart(createEvent(e.clientX, e.clientY, e))
         }
-        //e.preventDefault()
+        document.addEventListener('mousemove', onMouseMove)
+        document.addEventListener('mouseup', onMouseUp)
     }
 
     function onMouseUp(e) {
         document.removeEventListener('mousemove', onMouseMove)
         document.removeEventListener('mouseup', onMouseUp)
-        if (!touchMode) {
-            inEventProcessing = false
-            if (e.ctrlKey) {
-                stopDrawCallback()
-            }
-            if (e.shiftKey) {
-                selectCallback(e.clientX, e.clientY)
-            }
+        if (!e.ctrlKey && e.button !== MIDDLE_BUTTON_CODE) {
+            handler.onTouchEnd()
         }
     }
 
     function onMouseMove(e) {
-        if (e.ctrlKey) {
-            continueDrawCallback(e.clientX, e.clientY)
-        } else {
+        if (e.ctrlKey || e.button === MIDDLE_BUTTON_CODE) {
             moveStage(e.clientX - offsetX, e.clientY - offsetY)
+            e.preventDefault()
+        } else {
+            handler.onTouchMove(createEvent(e.clientX, e.clientY, e))
         }
     }
 
@@ -117,97 +109,49 @@ export function init(_stage) {
 
     let touchStartX
     let touchStartY
-    let needToSelect = false
-    let moveWidgetMode = false
-    let editMode = false
-    let prevTouchTime = Date.now()
-    let DOUBLE_TOUCH_TIME = 350
 
     function onTouchStart(e) {
-        editMode = false
-        if (!inEventProcessing && !inMultiToucheMode) {
-            inEventProcessing = true
+        log.log('m', '--onTouchStart')
+        if (!inMultiToucheMode) {
             touchMode = true
 
             let touch = e.touches[0]
             touchStartX = touch.clientX
             touchStartY = touch.clientY
-
-            let selectedWidget = isClickBySelectedWidgetCallback(touchStartX, touchStartY)
-            if (selectedWidget) {
-                let currentTouchTime = Date.now()
-                if (currentTouchTime - prevTouchTime < DOUBLE_TOUCH_TIME && selectedWidget.isEditModeAvailable()) {
-                    editMode = true
-                    startEditMode(selectedWidget)
-                } else {
-                    moveWidgetMode = true
-                    saveOffsetForMovedWidget(selectedWidget, touchStartX, touchStartY)
-                }
-            } else {
-                needToSelect = true
-                startDrawCallback(touchStartX, touchStartY)
-            }
+            handler.onTouchStart(createEvent(touch.clientX, touch.clientY, e))
 
             document.addEventListener('touchmove', onTouchMove)
             document.addEventListener('touchend', onTouchEnd)
-            document.addEventListener('touchstart', onSecondTouch)
-        }
-        prevTouchTime = Date.now()
-        if (!editMode) {
-            e.preventDefault()
+            document.addEventListener('touchstart', onSecondTouch, true)
         }
     }
 
     function onTouchMove(e) {
         if (!inMultiToucheMode) {
             let touch = e.touches[0]
-            let clientX = touch.clientX
-            let clientY = touch.clientY
-            if (moveWidgetMode) {
-                moveWidgetCallback(clientX, clientY)
-            } else {
-                continueDrawCallback(clientX, clientY)
-
-                const THRESHOLD = 5
-                if (needToSelect && (Math.abs(clientX - touchStartX) > THRESHOLD || Math.abs(clientY - touchStartY) > THRESHOLD)) {
-                    unselectCallback() //учеть перемещение
-                    needToSelect = false
-                }
-            }
+            handler.onTouchMove(createEvent(touch.clientX, touch.clientY, e))
         }
     }
 
-    function onTouchEnd(e) {
+    function onTouchEnd() {
         if (!inMultiToucheMode) {
-            console.log('needToSelect', needToSelect)
-            //todo cancel edit mode
-            if (needToSelect) {
-                // todo вынести из этого файла принятие решение о том надо выделять виджет или нет.
-                selectCallback(touchStartX, touchStartY)
-                stopDrawCallback(true)
-            } else if (!moveWidgetMode && !editMode) {
-                stopDrawCallback()
-            }
+            handler.onTouchEnd()
 
             document.removeEventListener('touchmove', onTouchMove)
             document.removeEventListener('touchend', onTouchEnd)
-            document.removeEventListener('touchstart', onSecondTouch)
-            if (touchMode) {
-                inEventProcessing = false
-            }
+            document.removeEventListener('touchstart', onSecondTouch, true)
         }
-
-        moveWidgetMode = false
-        needToSelect = false
     }
 
     // multitouch
 
     function onSecondTouch(e) {
+        log.log('m', '--onSecondTouch')
         let firstTouch = e.touches[0]
         let secondTouch = e.touches[1]
         if (secondTouch) {
-            stopDrawCallback(true)
+            handler.onSecondTouchStart()
+
             inMultiToucheMode = true
             initTouchesDistance = utils.distance(
                 firstTouch.clientX,
@@ -226,12 +170,9 @@ export function init(_stage) {
     }
 
     function onMultiTouchMove(e):void {
-        // Do not move if no second coords passed (second touch could be on opened comment, not on canvas).
-        if (e.touches.length < 2) { //data.params.secondTouchX === undefined || data.params.secondTouchY === undefined
+        if (e.touches.length < 2) {
             return
         }
-
-        needToSelect = false
 
         let firstTouch = e.touches[0]
         let secondTouch = e.touches[1]
@@ -259,13 +200,14 @@ export function init(_stage) {
                 deltaX,
                 deltaY
             )
-        }
-        else {
+        } else {
             moveStage(currentX + deltaX, currentY + deltaY)
         }
 
         prevMultiTouchCenterX = newCenterX
         prevMultiTouchCenterY = newCenterY
+
+        e.preventDefault()
     }
 
     function onMultiTouchUp():void {
@@ -273,39 +215,6 @@ export function init(_stage) {
         document.removeEventListener('touchmove', onMultiTouchMove)
         document.removeEventListener('touchup', onMultiTouchUp)
     }
-}
-/**
- * Установка калбеков
- */
-
-export function setDrawCallbacks(callback1, callback2, callback3) {
-    startDrawCallback = callback1
-    continueDrawCallback = callback2
-    stopDrawCallback = callback3
-}
-
-export function setSelectWidgetCallback(callback) {
-    selectCallback = callback
-}
-
-export function setUnselectWidgetCallback(callback) {
-    unselectCallback = callback
-}
-
-export function setIsClickBySelectedWidgetCallback(callback) {
-    isClickBySelectedWidgetCallback = callback
-}
-
-export function setMoveWidgetCallback(callback) {
-    moveWidgetCallback = callback
-}
-
-export function setSaveOffsetForMovedWidget(callback) {
-    saveOffsetForMovedWidget = callback
-}
-
-export function setStartEditModeCallback(callback) {
-    startEditMode = callback
 }
 
 ///////////////////////
@@ -351,4 +260,12 @@ export function getScreenToCanvasX(x:number):number {
 
 export function getScreenToCanvasY(y:number):number {
     return (y - currentY) / currentScale
+}
+
+function createEvent(x:number, y:number, e):IInputsHandlerEvent {
+    return {
+        x,
+        y,
+        preventDefault: () => e.preventDefault()
+    }
 }

@@ -1,21 +1,23 @@
-import BaseWidget from "./BaseWidget";
-import PictureWidget from "./PictureWidget";
-import TextBoxWidget from "./TextBoxWidget"
-import ButtonWidget from "./ButtonWidget"
-import RectangleWidget from "./RectangleWidget"
-import CircleWidget from "./CircleWidget"
-import LineWidget from "./LineWidget"
-import DebugWidget from "./DebugWidget"
-import TextLineWidget from "./TextLineWidget"
-import ParagraphWidget from "./ParagraphWidget"
-import HeadLineWidget from "./HeadLineWidget"
-import ComboBoxWidget from "./ComboBoxWidget"
-import ArrowWidget from "./ArrowWidget"
-import VLineWidget from "./VLineWidget"
+import BaseWidget from "./widgets/BaseWidget";
+import PictureWidget from "./widgets/PictureWidget";
+import TextBoxWidget from "./widgets/TextBoxWidget"
+import ButtonWidget from "./widgets/ButtonWidget"
+import RectangleWidget from "./widgets/RectangleWidget"
+import CircleWidget from "./widgets/CircleWidget"
+import LineWidget from "./widgets/LineWidget"
+import DebugWidget from "./widgets/DebugWidget"
+import TextLineWidget from "./widgets/TextLineWidget"
+import ParagraphWidget from "./widgets/ParagraphWidget"
+import HeadLineWidget from "./widgets/HeadLineWidget"
+import ComboBoxWidget from "./widgets/ComboBoxWidget"
+import ArrowWidget from "./widgets/ArrowWidget"
+import VLineWidget from "./widgets/VLineWidget"
 import UIController from "../ui/UIController"
 
-import IRect from "../mover/types/IRect"
-import WidgetTypes from "./WidgetTypes"
+import IRect from "./mover/types/IRect"
+import WidgetTypes from "./widgets/WidgetTypes"
+import InputsHandler from "./InputsHandler";
+import * as mover from "./mover/mover"
 
 export default class WidgetsController {
 
@@ -23,6 +25,8 @@ export default class WidgetsController {
     private widgetConstructors
     private widgets:BaseWidget[] = []
     private selectedWidget:BaseWidget = null
+
+    inputsHandler:InputsHandler
 
     constructor() {
         this.widgetConstructors = {
@@ -40,6 +44,8 @@ export default class WidgetsController {
             [WidgetTypes.ARROW]: ArrowWidget,
             [WidgetTypes.VLINE]: VLineWidget
         }
+
+        this.inputsHandler = new InputsHandler(this)
     }
 
     setUIController(ui:UIController) {
@@ -66,7 +72,7 @@ export default class WidgetsController {
         $(baseContainer).append(w.getElement())
     }
 
-    getWidgetUnderPoint(x, y):BaseWidget {
+    getWidgetUnderPoint(x:number, y:number):BaseWidget {
         let res = this.getWidgetOrButtonUnderPoint(x, y)
         return res.widget
     }
@@ -95,7 +101,7 @@ export default class WidgetsController {
         this.ui.showContextMenu()
     }
 
-    unselectSelectedWidget() {
+    deselectSelectedWidget() {
         if (this.selectedWidget) {
             this.selectedWidget.setSelected(false)
             this.selectedWidget = null

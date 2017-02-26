@@ -2,28 +2,34 @@ let contextMenu:JQuery
 let colorMenu:JQuery
 let handler:IUIHandler
 
+function addClickEvent(element:Element, handler:() => void) {
+    let stopPropagationHandler = (e) => {
+        e.stopPropagation()
+    }
+    element.addEventListener('mousedown', stopPropagationHandler)
+    element.addEventListener('touchstart', stopPropagationHandler)
+    element.addEventListener('click', handler)
+}
+
 export function init(uiHandler:IUIHandler) {
     handler = uiHandler
     contextMenu = $('#contextMenu')
     colorMenu = $('#colorMenu')
 
     colorMenu.find('.color-button').each((index, button) => {
-        button.addEventListener('touchstart', (e) => {
-            e.stopPropagation()
+        addClickEvent(button, () => {
             handler.onSetColor($(button).css('background-color'))
-        }, true)
+        })
     })
 
-    $('#contextMenu__color')[0].addEventListener('touchstart', (e) => {
-        e.stopPropagation()
+    addClickEvent($('#contextMenu__color')[0], () => {
         showColorMenu()
-    }, true)
+    })
 
-    $('#contextMenu__delete')[0].addEventListener('touchstart', (e) => {
-        e.stopPropagation()
+    addClickEvent($('#contextMenu__delete')[0], () => {
         handler.onDelete()
         hideContextMenu()
-    }, true)
+    })
 }
 
 export function showContextMenu() {

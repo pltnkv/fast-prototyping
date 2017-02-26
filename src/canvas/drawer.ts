@@ -1,4 +1,4 @@
-import WidgetsController from "./widgets/WidgetsController"
+import WidgetsController from "./WidgetsController"
 import * as mover from "./mover/mover"
 import WidgetTypes from "./widgets/WidgetTypes"
 import * as gestures from "./gestures"
@@ -58,10 +58,12 @@ export function initRecognizer(_widgetsController:WidgetsController) {
     _g.lineWidth = 1.5
 
     _rc = getCanvasRect(canvas)
-    mover.setDrawCallbacks(onStart, onContinue, onStop)
+    //todo переделать на события
+    widgetsController.inputsHandler.setDrawCallbacks(onStart, onContinue, onStop)
 }
 
 function onStart(_x, _y) {
+    log.log('drw', 'onStart')
     let {x, y} = getPosition(_x, _y)
 
     if (isNewGesture) {
@@ -81,6 +83,7 @@ function onStart(_x, _y) {
 }
 
 function onContinue(_x, _y) {
+    log.log('drw', 'onContinue')
     let {x, y} = getPosition(_x, _y)
     _points[_points.length] = new Point(x, y) // append
     drawConnectedPoint(_points.length - 2, _points.length - 1)
@@ -89,22 +92,26 @@ function onContinue(_x, _y) {
 let timeoutId
 
 function onStop(cancel:boolean) {
-    console.log('onStop 3')
-    log.log('w', 'onStop', cancel, 4)
+    log.log('drw', 'onStop', cancel)
     //todo start simplify from here
     if (!cancel) {
         _strokes.push(_points.slice()) // add new copy to set
         drawSimplifiedStroke(_points.slice())
 
         let res = recognize()
-        if (res.Score > coefficients[res.Name] && finalizedGestures.includes(res.Name)) {
-            //    tryCreateWidget(res)
+        log.log('drw', 'res.Name', res.Name, res.Score)
+        if(typeof res.Name !== 'string') {
+            return
+        }
+
+        if (res.Name && res.Score > coefficients[res.Name] && finalizedGestures.includes(res.Name)) {
+            tryCreateWidget(res)
             return
         }
 
         timeoutId = setTimeout(() => {
             let res = recognize()
-            //  tryCreateWidget(res)
+            tryCreateWidget(res)
         }, 1000)
     } else {
         clearRect()
@@ -115,13 +122,10 @@ function onStop(cancel:boolean) {
 }
 
 function drawSimplifiedStroke(_points) {
-    setTimeout(() => {
-        log.log('w', '_points.length', _points.length)
-        let t1 = performance.now()
+    log.log('drw', '_points.length', _points.length)
+    if (_points.length >= 2) {
         let simplPoints = simplify(_points, 10)
-        //let simplPoints = simplify(simplPoints, 30)
-        log.log('w', 'time', performance.now() - t1)
-        log.log('w', 'simplPoints.length', simplPoints.length)
+        log.log('drw', 'simplPoints.length', simplPoints.length)
 
         let clr = "#990000"
         _g.beginPath();
@@ -132,12 +136,13 @@ function drawSimplifiedStroke(_points) {
             _g.lineTo(simplPoints[i].x, simplPoints[i].y)
         }
         _g.stroke()
-    }, 500)
+    }
 }
 
 let prevBounds
 
 function tryCreateWidget(res) {
+    log.log('drw', 'tryCreateWidget')
     console.info(res)
     let bounds = getBounds()
     if ((bounds.width >= 50 || bounds.height >= 50)
@@ -163,7 +168,7 @@ function tryCreateWidget(res) {
 // recognition
 ////////////////////////////////////////////////////////////
 
-function recognize():{ Score:number; Name:string } {
+function recognize():{ Score:number; Name:string | null } {
     if (_strokes.length > 1 || (_strokes.length == 1 && _strokes[0].length >= 10)) {
         return gestures.recognize(_strokes)
     } else {
