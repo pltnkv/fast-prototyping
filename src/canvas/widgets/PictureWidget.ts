@@ -1,4 +1,4 @@
-import BaseWidget from "./BaseWidget"
+import BaseWidget from './BaseWidget'
 
 // const template = (p) => `
 // <div class="mockup-prototyping-view placeholder border" style="border-color: ${p.color}">
@@ -35,7 +35,7 @@ export default class PictureWidget extends BaseWidget {
             .on('change', () => {
                 let input:any = this.getElement().find(('.file-input-pic'))[0]
                 if (input.files && input.files[0]) {
-                    var reader = new FileReader();
+                    var reader = new FileReader()
                     reader.onload = (e:any) => {
                         this.getElement().find(('.img-container'))
                             .css({
@@ -44,7 +44,7 @@ export default class PictureWidget extends BaseWidget {
                             })
                         this.getElement().find(('.mockup-prototyping-view')).hide()
                     }
-                    reader.readAsDataURL(input.files[0]);
+                    reader.readAsDataURL(input.files[0])
                 }
             })
     }

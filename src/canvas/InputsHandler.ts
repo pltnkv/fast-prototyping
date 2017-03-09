@@ -1,10 +1,11 @@
-import IInputsHandler from "./mover/IInputsHandler";
-import WidgetsController from "./WidgetsController";
-import IInputsHandlerEvent from "./mover/IInputsHandlerEvent";
-import BaseWidget from "./widgets/BaseWidget";
-import * as mover from "./mover/mover"
-import {discreteRound} from "./mover/utils";
-import {clearPrevBounds} from "./smartGrid";
+import IInputsHandler from './mover/IInputsHandler'
+import WidgetsController from './WidgetsController'
+import IInputsHandlerEvent from './mover/IInputsHandlerEvent'
+import BaseWidget from './widgets/BaseWidget'
+import * as mover from './mover/mover'
+import {discreteRound} from './mover/utils'
+import {clearPrevBounds} from './smartGrid'
+import {getStrokesCount} from './drawer'
 
 const DOUBLE_TOUCH_TIME = 350
 const MOVE_STEP = 10
@@ -91,13 +92,13 @@ export default class InputsHandler implements IInputsHandler {
                     this.deselectWidget()
                     this.needToSelect = false
                 }
-                break;
+                break
             case HandlerMode.MOVE:
                 this.moveWidget(widget, e.x, e.y)
-                break;
+                break
             case HandlerMode.RESIZE:
                 this.resizeWidget(widget, e.x, e.y)
-                break;
+                break
         }
         e.preventDefault()
     }
@@ -105,13 +106,16 @@ export default class InputsHandler implements IInputsHandler {
     onTouchEnd() {
         log.log('w', 'onTouchEnd')
         if (this.needToSelect) {
-            this.selectWidget(this.touchStartX, this.touchStartY)
-            // todo для точки this.needToSelect равен true
-            this.stopDrawCallback(true)
+            if (getStrokesCount() === 0) {
+                this.selectWidget(this.touchStartX, this.touchStartY)
+                this.stopDrawCallback('cancel')
+            } else {
+                this.stopDrawCallback('point')
+            }
         } else if (this.mode === HandlerMode.DRAW) {
-            this.stopDrawCallback()
+            this.stopDrawCallback('normal')
         } else {
-            this.stopDrawCallback(true)
+            this.stopDrawCallback('cancel')
         }
     }
 

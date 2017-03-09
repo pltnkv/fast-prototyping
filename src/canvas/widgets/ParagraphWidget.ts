@@ -1,6 +1,6 @@
-import BaseWidget from "./BaseWidget"
+import BaseWidget from './BaseWidget'
 
-const LINE_HEIGHT = 16;
+const LINE_HEIGHT = 16
 
 const template = () => `
 <div class="mockup-view mockup-view-2016 mockup-prototyping-view textline full-size">

@@ -1,4 +1,4 @@
-import IPoint from "types/IPoint"
+import IPoint from 'types/IPoint'
 
 //клон из application/canvas/commons/helpers/MathUtils, но без зависимости от PIXI.Point
 function lerpNumber(begin:number, end:number, t:number):number {

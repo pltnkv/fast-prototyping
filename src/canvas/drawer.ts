@@ -1,41 +1,43 @@
-import WidgetsController from "./WidgetsController"
-import * as mover from "./mover/mover"
-import WidgetTypes from "./widgets/WidgetTypes"
-import * as gestures from "./gestures"
-import IRect from "./mover/types/IRect";
-import {correctBounds, getBounds, savePrevBounds} from "./smartGrid";
-import IPoint from "./mover/types/IPoint";
-import {distanceSqr} from "./mover/PointUtils";
+import WidgetsController from './WidgetsController'
+import * as mover from './mover/mover'
+import WidgetType from './widgets/WidgetType'
+import * as gestures from './gesturesRecognizer'
+import IRect from './mover/types/IRect'
+import {correctBounds, getBounds, savePrevBounds} from './smartGrid'
+import IPoint from './mover/types/IPoint'
+import {distanceSqr} from './mover/PointUtils'
+import Gestures from './Gestures'
 
 const simplify = require('simplify-js')
 
+// ниже 0.7 может выдать полную хрень
 const coefficients = {
-    [WidgetTypes.DEBUG]: 1, // fake
-    [WidgetTypes.TEXTLINE]: 0.9,
-    [WidgetTypes.PARAGRAPH]: 0.78,
-    [WidgetTypes.HEADLINE]: 0.83,
-    [WidgetTypes.BUTTON]: 0.9,
-    [WidgetTypes.COMBOBOX]: 0.8,
-    [WidgetTypes.PICTURE]: 0.8,
-    [WidgetTypes.RECTANGLE]: 0.85,
-    [WidgetTypes.TEXTFIELD]: 0.8,
-    [WidgetTypes.LINE]: 0.94,
-    [WidgetTypes.VLINE]: 0.94,
-    [WidgetTypes.CIRCLE]: 0.85,
-    [WidgetTypes.ARROW]: 0.8,
-    [WidgetTypes.ERASE]: 0.6
+    [WidgetType.DEBUG]: 1, // fake
+    [WidgetType.TEXTLINE]: 0.9,
+    [WidgetType.PARAGRAPH]: 0.78,
+    [WidgetType.HEADLINE]: 0.83,
+    [WidgetType.BUTTON]: 0.9,
+    [WidgetType.COMBOBOX]: 0.8,
+    [WidgetType.PICTURE]: 0.8,
+    [WidgetType.RECTANGLE]: 0.85,
+    [WidgetType.TEXTFIELD]: 0.8,
+    [WidgetType.LINE]: 0.94,
+    [WidgetType.VLINE]: 0.94,
+    [WidgetType.CIRCLE]: 0.85,
+    [WidgetType.ARROW]: 0.8,
+    [WidgetType.ERASE]: 0.6
 }
 
 const finalizedGestures = [
-    WidgetTypes.PARAGRAPH,
-    WidgetTypes.COMBOBOX,
-    WidgetTypes.PICTURE,
-    WidgetTypes.RECTANGLE,
-    WidgetTypes.CIRCLE,
-    WidgetTypes.ARROW,
-    WidgetTypes.ERASE,
-    WidgetTypes.LINE,
-    WidgetTypes.VLINE,
+    WidgetType.PARAGRAPH,
+    WidgetType.COMBOBOX,
+    WidgetType.PICTURE,
+    WidgetType.RECTANGLE,
+    WidgetType.CIRCLE,
+    WidgetType.ARROW,
+    WidgetType.ERASE,
+    WidgetType.LINE,
+    WidgetType.VLINE
 ]
 
 let widgetsController:WidgetsController
@@ -63,6 +65,10 @@ export function initRecognizer(_widgetsController:WidgetsController) {
     widgetsController.inputsHandler.setDrawCallbacks(onStart, onContinue, onStop)
 }
 
+export function getStrokesCount():number {
+    return _strokes.length
+}
+
 function onStart(_x, _y) {
     log.log('drw', 'onStart')
     let {x, y} = getPosition(_x, _y)
@@ -72,7 +78,7 @@ function onStart(_x, _y) {
         _strokes.length = 0
     }
 
-    const clr = "#6699FF"
+    const clr = '#6699FF'
     _g.strokeStyle = clr
     _g.fillStyle = clr
 
@@ -90,29 +96,47 @@ function onContinue(_x, _y) {
 }
 
 
-function onStop(cancel:boolean) {
-    console.log('onStop', cancel)
-    log.log('drw', 'onStop', cancel)
-    // todo start simplify from here
-    // todo распознавать точку как отдельный элемент ввода
-    if (!cancel) {
-        console.log('isPoint', isPoint(_points))
+// start simplify from here
+function onStop(reason:'normal' | 'cancel' | 'point') {
+    log.log('drw', 'onStop, reason=', reason)
+
+    if (reason === 'normal') {
         log.log('t', 'isPoint', isPoint(_points))
         _strokes.push(_points.slice()) // add new copy to set
         drawSimplifiedStroke(_points.slice())
 
         let res = recognize()
-        log.log('drw', 'res.Name', res.Name, res.Score)
+        log.log('drw', 'res=', res)
 
-        if (res.Name && res.Score > coefficients[res.Name] && finalizedGestures.includes(res.Name)) {
-            tryCreateWidget(res)
+        // todo на основе жестов создавать виджеты
+        /*let bounds = getBounds(_strokes)
+        if (canCreateWidget(res, bounds) && finalizedGestures.includes(res.name!)) {
+            tryCreateWidget(res, bounds)
             return
         }
 
         timeoutId = setTimeout(() => {
-            let res = recognize()
-            tryCreateWidget(res)
-        }, 1000)
+            res = recognize()
+            bounds = getBounds(_strokes)
+            tryCreateWidget(res, bounds)
+        }, 1000)*/
+    } else if (reason === 'point') {
+        // точка - это конечное событие после него обнуляются strokes и пытается создаться фигура
+        console.log('point')
+
+        let res = recognize()
+        // попробовать создать енум из строк в тс, возможно нужно использовать types
+        // if (res.name === WidgetType.L) {
+        //     let bounds = getBounds(_strokes)
+        //     tryCreateWidget(res, bounds)
+        // }
+        // if (res.Name && res.Score > coefficients[res.Name] && finalizedGestures.includes(res.Name)) {
+        //     tryCreateWidget(res)
+        //     return
+        // }
+
+        clearRect()
+        clearPoints()
     } else {
         clearRect()
         clearPoints()
@@ -121,14 +145,12 @@ function onStop(cancel:boolean) {
     _points.length = 0
 }
 
-function tryCreateWidget(res) {
+function tryCreateWidget(res, bounds:IRect) {
     log.log('drw', 'tryCreateWidget')
-    console.info(res)
-    let bounds = getBounds(_strokes)
     //drawBoundingBox(bounds)
-    if ((bounds.width >= 50 || bounds.height >= 50)
-        && res.Score > coefficients[res.Name]) {
-        if (res.Name === WidgetTypes.ERASE) {
+    console.log('tryCreateWidget')
+    if (canCreateWidget(res, bounds)) {
+        if (res.Name === WidgetType.ERASE) {
             let x = bounds.x + bounds.width / 2
             let y = bounds.y + bounds.height / 2
             let widget = widgetsController.getWidgetUnderPoint(mover.getCanvasToScreenX(x), mover.getCanvasToScreenY(y))
@@ -145,16 +167,23 @@ function tryCreateWidget(res) {
     clearPoints()
 }
 
+function canCreateWidget(res, bounds:IRect):boolean {
+    return (bounds.width >= 50 || bounds.height >= 50) && res.Score > coefficients[res.Name]
+}
+
 ////////////////////////////////////////////////////////////
 // recognition
 ////////////////////////////////////////////////////////////
 
-function recognize():{ Score:number; Name:string | null } {
+function recognize():gestures.IRecognizeResult {
+    let res
     if (_strokes.length > 1 || (_strokes.length == 1 && _strokes[0].length >= 10)) {
-        return gestures.recognize(_strokes)
+        res = gestures.recognize(_strokes)
     } else {
-        return {Score: 0, Name: null}
+        res = {score: 0, name: null}
     }
+    console.log('recognize', Gestures[res.name], res.score)
+    return res
 }
 
 function clearPoints() {
@@ -210,7 +239,7 @@ const POINT_DISTANCE_THRESHOLD = Math.sqrt(2)
 
 function isPoint(stroke:IPoint[]):boolean {
     return stroke.length === 1
-        || stroke.length <= 4 && distanceSqr(stroke[0], stroke[stroke.length-1]) < POINT_DISTANCE_THRESHOLD
+        || stroke.length <= 4 && distanceSqr(stroke[0], stroke[stroke.length - 1]) < POINT_DISTANCE_THRESHOLD
 }
 
 ////////////////////////////////////////////////////////////
@@ -224,8 +253,8 @@ function drawSimplifiedStroke(_points) {
         let simplPoints = simplify(_points, 10)
         log.log('drw', 'simplPoints.length', simplPoints.length)
 
-        let clr = "#990000"
-        _g.beginPath();
+        let clr = '#990000'
+        _g.beginPath()
         _g.strokeStyle = clr
         _g.fillStyle = clr
         _g.moveTo(simplPoints[0].x, simplPoints[0].y)
@@ -238,8 +267,8 @@ function drawSimplifiedStroke(_points) {
 
 
 function drawBoundingBox(rect:IRect) {
-    let clr = "#0a9900"
-    _g.beginPath();
+    let clr = '#0a9900'
+    _g.beginPath()
     _g.rect(rect.x, rect.y, rect.width, rect.height)
     _g.strokeStyle = clr
     _g.stroke()

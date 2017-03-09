@@ -1,6 +1,6 @@
-import * as utils from "./utils"
-import {IInputsHandler} from "./IInputsHandler";
-import IInputsHandlerEvent from "./IInputsHandlerEvent";
+import * as utils from './utils'
+import {IInputsHandler} from './IInputsHandler'
+import IInputsHandlerEvent from './IInputsHandlerEvent'
 
 const WHEEL_EVENT_NAME = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel'
 const DEFAULT_SCALE = 0.4
@@ -99,7 +99,7 @@ export function init(_stage) {
     }
 
     function getNewScaleAfterWheel(e:any) {
-        let deltaZoom:number = e.wheelDelta ? e.wheelDelta : (e.deltaY ? -e.deltaY * 20 : -e.deltaX * 20);
+        let deltaZoom:number = e.wheelDelta ? e.wheelDelta : (e.deltaY ? -e.deltaY * 20 : -e.deltaX * 20)
         return getNewScale(deltaZoom)
     }
 

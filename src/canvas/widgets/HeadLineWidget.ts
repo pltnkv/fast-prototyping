@@ -1,4 +1,4 @@
-import BaseWidget from "./BaseWidget"
+import BaseWidget from './BaseWidget'
 
 const template = () => `
 <h1 class="mockup-view mockup-view-2016 mockup-prototyping-view textline headline">

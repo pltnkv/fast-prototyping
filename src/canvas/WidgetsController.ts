@@ -1,22 +1,22 @@
-import BaseWidget from "./widgets/BaseWidget";
-import PictureWidget from "./widgets/PictureWidget";
-import TextBoxWidget from "./widgets/TextBoxWidget"
-import ButtonWidget from "./widgets/ButtonWidget"
-import RectangleWidget from "./widgets/RectangleWidget"
-import CircleWidget from "./widgets/CircleWidget"
-import LineWidget from "./widgets/LineWidget"
-import DebugWidget from "./widgets/DebugWidget"
-import TextLineWidget from "./widgets/TextLineWidget"
-import ParagraphWidget from "./widgets/ParagraphWidget"
-import HeadLineWidget from "./widgets/HeadLineWidget"
-import ComboBoxWidget from "./widgets/ComboBoxWidget"
-import ArrowWidget from "./widgets/ArrowWidget"
-import VLineWidget from "./widgets/VLineWidget"
-import UIController from "../ui/UIController"
+import BaseWidget from './widgets/BaseWidget'
+import PictureWidget from './widgets/PictureWidget'
+import TextBoxWidget from './widgets/TextBoxWidget'
+import ButtonWidget from './widgets/ButtonWidget'
+import RectangleWidget from './widgets/RectangleWidget'
+import CircleWidget from './widgets/CircleWidget'
+import LineWidget from './widgets/LineWidget'
+import DebugWidget from './widgets/DebugWidget'
+import TextLineWidget from './widgets/TextLineWidget'
+import ParagraphWidget from './widgets/ParagraphWidget'
+import HeadLineWidget from './widgets/HeadLineWidget'
+import ComboBoxWidget from './widgets/ComboBoxWidget'
+import ArrowWidget from './widgets/ArrowWidget'
+import VLineWidget from './widgets/VLineWidget'
+import UIController from '../ui/UIController'
 
-import IRect from "./mover/types/IRect"
-import WidgetTypes from "./widgets/WidgetTypes"
-import InputsHandler from "./InputsHandler"
+import IRect from './mover/types/IRect'
+import WidgetType from './widgets/WidgetType'
+import InputsHandler from './InputsHandler'
 
 export default class WidgetsController {
 
@@ -29,19 +29,20 @@ export default class WidgetsController {
 
     constructor() {
         this.widgetConstructors = {
-            [WidgetTypes.DEBUG]: DebugWidget,
-            [WidgetTypes.PICTURE]: PictureWidget,
-            [WidgetTypes.TEXTFIELD]: TextBoxWidget,
-            [WidgetTypes.BUTTON]: ButtonWidget,
-            [WidgetTypes.RECTANGLE]: RectangleWidget,
-            [WidgetTypes.CIRCLE]: CircleWidget,
-            [WidgetTypes.LINE]: LineWidget,
-            [WidgetTypes.TEXTLINE]: TextLineWidget,
-            [WidgetTypes.PARAGRAPH]: ParagraphWidget,
-            [WidgetTypes.HEADLINE]: HeadLineWidget,
-            [WidgetTypes.COMBOBOX]: ComboBoxWidget,
-            [WidgetTypes.ARROW]: ArrowWidget,
-            [WidgetTypes.VLINE]: VLineWidget
+            [WidgetType.DEBUG]: DebugWidget,
+            [WidgetType.PICTURE]: PictureWidget,
+            [WidgetType.TEXTFIELD]: TextBoxWidget,
+            [WidgetType.BUTTON]: ButtonWidget,
+            [WidgetType.RECTANGLE]: RectangleWidget,
+            [WidgetType.CIRCLE]: CircleWidget,
+            [WidgetType.LINE]: LineWidget,
+            [WidgetType.TEXTLINE]: TextLineWidget,
+            [WidgetType.PARAGRAPH]: ParagraphWidget,
+            [WidgetType.HEADLINE]: HeadLineWidget,
+            [WidgetType.COMBOBOX]: ComboBoxWidget,
+            [WidgetType.ARROW]: ArrowWidget,
+            [WidgetType.VLINE]: VLineWidget,
+            [WidgetType.L]: LineWidget
         }
 
         this.inputsHandler = new InputsHandler(this)
@@ -51,7 +52,8 @@ export default class WidgetsController {
         this.ui = ui
     }
 
-    createWidget(widgetType:string, positionAndSize:IRect, params:any) {
+    createWidget(widgetType:WidgetType, positionAndSize:IRect, params:any) {
+        console.log('createWidget, widgetType=', widgetType)
         if (!widgetType) {
             return
         }

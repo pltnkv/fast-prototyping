@@ -1,4 +1,4 @@
-import IInputsHandlerEvent from "./IInputsHandlerEvent";
+import IInputsHandlerEvent from './IInputsHandlerEvent'
 
 export interface IInputsHandler {
     setDrawCallbacks(startDrawCallback, continueDrawCallback, stopDrawCallback):void

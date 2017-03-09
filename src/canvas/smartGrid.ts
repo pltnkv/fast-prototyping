@@ -1,8 +1,8 @@
-import IRect from "./mover/types/IRect"
-import IPoint from "./mover/types/IPoint"
-import {discreteRound} from "./mover/utils"
+import IRect from './mover/types/IRect'
+import IPoint from './mover/types/IPoint'
+import {discreteRound} from './mover/utils'
 
-const STEP = 20
+const STEP = 10
 let prevBounds:IRect | null
 
 export function getBounds(strokes:IPoint[][]):IRect {
